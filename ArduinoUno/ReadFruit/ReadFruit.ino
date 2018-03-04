@@ -40,13 +40,18 @@ uint8_t F = 0b00000010;
 uint8_t G = 0b00000001;
 
 // Rough estimates
-uint16_t A_period = 2000; //us
-uint16_t B_period = 1700; //us
 uint16_t C_period = 1600; //us
+uint16_t Cs_period = 1500; //us
 uint16_t D_period = 1400; //us
-uint16_t E_period = 1200; //us
-uint16_t F_period = 1120; //us
-uint16_t G_period = 950; //us
+uint16_t Ds_period = 1310; //us
+uint16_t E_period = 1220; //us
+uint16_t F_period = 1140; //us
+uint16_t Fs_period = 1050; //us
+uint16_t G_period = 975; //us
+uint16_t Gs_period = 900; //us
+uint16_t A_period = 840; //us
+uint16_t As_period = 780; //us
+uint16_t B_period = 710; //us
 
 uint16_t cur_delay_us = A_period;
 int sound_on = 0;
@@ -94,32 +99,40 @@ void loop() {
         sound_on = 1;
         switch (i) {
           case 0:
-            //activeNotes |= A;
-            cur_delay_us = A_period;
-            break;
-          case 1:
-            //activeNotes |= B;
-            cur_delay_us = B_period;
-            break;
-          case 2:
-            //activeNotes |= C;
             cur_delay_us = C_period;
             break;
-          case 3:
-            //activeNotes |= D;
+          case 1:
+            cur_delay_us = Cs_period;
+            break;
+          case 2:
             cur_delay_us = D_period;
             break;
+          case 3:
+            cur_delay_us = Ds_period;
+            break;
           case 4:
-            //activeNotes |= E;
             cur_delay_us = E_period;
             break;
           case 5:
-            //activeNotes |= F;
             cur_delay_us = F_period;
             break;
           case 6:
-            //activeNotes |= G;
+            cur_delay_us = Fs_period;
+            break;
+          case 7:
             cur_delay_us = G_period;
+            break;
+          case 8:
+            cur_delay_us = Gs_period;
+            break;
+          case 9:
+            cur_delay_us = A_period;
+            break;
+          case 10:
+            cur_delay_us = As_period;
+            break;
+          case 11:
+            cur_delay_us = B_period;
             break;
         }
          // reset our state
