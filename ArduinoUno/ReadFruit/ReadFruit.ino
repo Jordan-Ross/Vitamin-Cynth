@@ -54,6 +54,7 @@ uint16_t As_period = 780; //us
 uint16_t B_period = 710; //us
 
 uint16_t cur_delay_us = A_period;
+uint16_t cur_delays[12] = {0};
 int sound_on = 0;
 
 void setup() {
@@ -97,6 +98,8 @@ void loop() {
       if (curtouchedcount > MIN_ITERATIONS) {
         //Serial.print(i); Serial.println(" touched");
         sound_on = 1;
+        cur_delays[i] = 1;
+        /*
         switch (i) {
           case 0:
             cur_delay_us = C_period;
@@ -135,6 +138,7 @@ void loop() {
             cur_delay_us = B_period;
             break;
         }
+        */
          // reset our state
         //lasttouched = currtouched;
       }
@@ -148,6 +152,7 @@ void loop() {
       if (curtouchedcount > MIN_ITERATIONS) {
         //Serial.print(i); Serial.println(" released");
         sound_on = 0;
+        cur_delays[i] = 0;
         /*
         switch (i) {
           //case 1:
@@ -181,11 +186,53 @@ void loop() {
 
 
   }
-  
-  if (sound_on) digitalWrite(SOUND_PIN, HIGH);
-  delayMicroseconds(cur_delay_us);
-  if (sound_on) digitalWrite(SOUND_PIN, LOW);
-  delayMicroseconds(cur_delay_us);
+  for (int j = 0; j < 12; j++) {
+      if (cur_delays[j]) {
+          switch (j) {
+          case 0:
+            cur_delay_us = C_period;
+            break;
+          case 1:
+            cur_delay_us = Cs_period;
+            break;
+          case 2:
+            cur_delay_us = D_period;
+            break;
+          case 3:
+            cur_delay_us = Ds_period;
+            break;
+          case 4:
+            cur_delay_us = E_period;
+            break;
+          case 5:
+            cur_delay_us = F_period;
+            break;
+          case 6:
+            cur_delay_us = Fs_period;
+            break;
+          case 7:
+            cur_delay_us = G_period;
+            break;
+          case 8:
+            cur_delay_us = Gs_period;
+            break;
+          case 9:
+            cur_delay_us = A_period;
+            break;
+          case 10:
+            cur_delay_us = As_period;
+            break;
+          case 11:
+            cur_delay_us = B_period;
+            break;
+        }
+      if (sound_on) digitalWrite(SOUND_PIN, HIGH);
+      delayMicroseconds(cur_delay_us);
+      if (sound_on) digitalWrite(SOUND_PIN, LOW);
+      delayMicroseconds(cur_delay_us);
+      }
+  }
+
   
   return;
   
