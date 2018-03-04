@@ -40,13 +40,13 @@ int G = 8;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(A, OUTPUT);
-  pinMode(B, OUTPUT);
-  pinMode(C, OUTPUT);
-  pinMode(D, OUTPUT);
-  pinMode(E, OUTPUT);
-  pinMode(F, OUTPUT);
-  pinMode(G, OUTPUT);
+//  pinMode(A, OUTPUT);
+//  pinMode(B, OUTPUT);
+//  pinMode(C, OUTPUT);
+//  pinMode(D, OUTPUT);
+//  pinMode(E, OUTPUT);
+//  pinMode(F, OUTPUT);
+//  pinMode(G, OUTPUT);
   
   while (!Serial) { // needed to keep leonardo/micro from starting too fast!
     delay(10);
@@ -65,7 +65,7 @@ void setup() {
 }
 
 void loop() {
-
+  //Serial.println("hello pi");
   // Get the currently touched pads
   currtouched = cap.touched();
 
@@ -80,6 +80,7 @@ void loop() {
     if ((currtouched & _BV(i)) ) {
       if (curtouchedcount > MIN_ITERATIONS) {
         Serial.print(i); Serial.println(" touched");
+        /*
         switch (i) {
           //case 1:
           case 9: // Pin 9 because that's what's connected right now (lol)
@@ -104,6 +105,7 @@ void loop() {
             digitalWrite(G, HIGH);
             break;
         }
+        */
          // reset our state
         //lasttouched = currtouched;
       }
@@ -113,6 +115,7 @@ void loop() {
     if (!(currtouched & _BV(i)) && (lasttouched & _BV(i))) {
       if (curtouchedcount > MIN_ITERATIONS) {
         Serial.print(i); Serial.println(" released");
+        /*
         switch (i) {
           //case 1:
           case 9: // Pin 9 because that's what's connected right now (lol)
@@ -137,6 +140,7 @@ void loop() {
             digitalWrite(G, LOW);
             break;
         }
+        */
       }
       lasttouched = 0;
       curtouchedcount = 0;
