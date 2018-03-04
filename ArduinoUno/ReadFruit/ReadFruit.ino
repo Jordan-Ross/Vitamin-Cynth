@@ -29,38 +29,31 @@ uint16_t lasttouched = 0;
 uint16_t currtouched = 0;
 uint16_t curtouchedcount = 0;
 
-// Setup output pins with notes
-int A = 2;
-int B = 3;
-int C = 4;
-int D = 5;
-int E = 6;
-int F = 7;
-int G = 8;
+uint8_t RESET = 0b10000000;
+uint8_t A = 0b01000000;
+uint8_t B = 0b00100000;
+uint8_t C = 0b00010000;
+uint8_t D = 0b00001000;
+uint8_t E = 0b00000100;
+uint8_t F = 0b00000010;
+uint8_t G = 0b00000001;
 
 void setup() {
   Serial.begin(9600);
-//  pinMode(A, OUTPUT);
-//  pinMode(B, OUTPUT);
-//  pinMode(C, OUTPUT);
-//  pinMode(D, OUTPUT);
-//  pinMode(E, OUTPUT);
-//  pinMode(F, OUTPUT);
-//  pinMode(G, OUTPUT);
   
   while (!Serial) { // needed to keep leonardo/micro from starting too fast!
     delay(10);
   }
 
-  Serial.println("Adafruit MPR121 Capacitive Touch sensor test");
+  //Serial.println("Adafruit MPR121 Capacitive Touch sensor test");
 
   // Default address is 0x5A, if tied to 3.3V its 0x5B
   // If tied to SDA its 0x5C and if SCL then 0x5D
   if (!cap.begin(0x5A)) {
-    Serial.println("MPR121 not found, check wiring?");
+    //Serial.println("MPR121 not found, check wiring?");
     while (1);
   }
-  Serial.println("MPR121 found!");
+  //Serial.println("MPR121 found!");
   cap.setThresholds(30, 6);
 }
 
@@ -68,6 +61,8 @@ void loop() {
   //Serial.println("hello pi");
   // Get the currently touched pads
   currtouched = cap.touched();
+  
+  uint8_t activeNotes = B00000000;
 
   for (uint8_t i = 0; i < 12; i++) {
     // it if *is* touched, increment count
@@ -79,33 +74,32 @@ void loop() {
     //if ((currtouched & _BV(i)) && !(lasttouched & _BV(i))) {
     if ((currtouched & _BV(i)) ) {
       if (curtouchedcount > MIN_ITERATIONS) {
-        Serial.print(i); Serial.println(" touched");
-        /*
+        //Serial.print(i); Serial.println(" touched");
+
         switch (i) {
           //case 1:
           case 9: // Pin 9 because that's what's connected right now (lol)
-            digitalWrite(A, HIGH);
+            activeNotes |= A;
             break;
           case 2:
-            digitalWrite(B, HIGH);
+            activeNotes |= B;
             break;
           case 3:
-            digitalWrite(C, HIGH);
+            activeNotes |= C;
             break;
           case 4:
-            digitalWrite(D, HIGH);
+            activeNotes |= D;
             break;
           case 5:
-            digitalWrite(E, HIGH);
+            activeNotes |= E;
             break;
           case 6:
-            digitalWrite(F, HIGH);
+            activeNotes |= F;
             break;
           case 7:
-            digitalWrite(G, HIGH);
+            activeNotes |= G;
             break;
         }
-        */
          // reset our state
         //lasttouched = currtouched;
       }
@@ -114,38 +108,41 @@ void loop() {
     // if it *was* touched and now *isnt*, alert!
     if (!(currtouched & _BV(i)) && (lasttouched & _BV(i))) {
       if (curtouchedcount > MIN_ITERATIONS) {
-        Serial.print(i); Serial.println(" released");
-        /*
+        //Serial.print(i); Serial.println(" released");
         switch (i) {
           //case 1:
           case 9: // Pin 9 because that's what's connected right now (lol)
-            digitalWrite(A, LOW);
+            activeNotes &= !A;
             break;
           case 2:
-            digitalWrite(B, LOW);
+            activeNotes &= !B;
             break;
           case 3:
-            digitalWrite(C, LOW);
+            activeNotes &= !C;
             break;
           case 4:
-            digitalWrite(D, LOW);
+            activeNotes &= !D;
             break;
           case 5:
-            digitalWrite(E, LOW);
+            activeNotes &= !E;
             break;
           case 6:
-            digitalWrite(F, LOW);
+            activeNotes &= !F;
             break;
           case 7:
-            digitalWrite(G, LOW);
+            activeNotes &= !G;
             break;
         }
-        */
       }
       lasttouched = 0;
       curtouchedcount = 0;
     }
   }
+  
+  Serial.write(RESET);
+  Serial.write(activeNotes);
+  Serial.write(0);
+  Serial.write(0);
 
 
 
