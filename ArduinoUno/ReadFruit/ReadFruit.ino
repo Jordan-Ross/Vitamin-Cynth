@@ -19,6 +19,7 @@
 #include "Adafruit_MPR121.h"
 
 #define MIN_ITERATIONS 15
+#define SOUND_PIN 7
 
 // You can have up to 4 on one i2c bus but one is enough for testing!
 Adafruit_MPR121 cap = Adafruit_MPR121();
@@ -38,13 +39,27 @@ uint8_t E = 0b00000100;
 uint8_t F = 0b00000010;
 uint8_t G = 0b00000001;
 
+// Rough estimates
+uint16_t A_period = 2000; //us
+uint16_t B_period = 1700; //us
+uint16_t C_period = 1600; //us
+uint16_t D_period = 1400; //us
+uint16_t E_period = 1200; //us
+uint16_t F_period = 1120; //us
+uint16_t G_period = 950; //us
+
+uint16_t cur_delay_us = A_period;
+int sound_on = 0;
+
 void setup() {
   Serial.begin(9600);
   
   while (!Serial) { // needed to keep leonardo/micro from starting too fast!
     delay(10);
   }
-
+  
+  pinMode(SOUND_PIN, OUTPUT);           // set pin to output
+  
   //Serial.println("Adafruit MPR121 Capacitive Touch sensor test");
 
   // Default address is 0x5A, if tied to 3.3V its 0x5B
@@ -58,11 +73,12 @@ void setup() {
 }
 
 void loop() {
-  //Serial.println("hello pi");
+
   // Get the currently touched pads
   currtouched = cap.touched();
   
-  uint8_t activeNotes = B00000000;
+  //uint8_t activeNotes = B00000000;
+
 
   for (uint8_t i = 0; i < 12; i++) {
     // it if *is* touched, increment count
@@ -75,29 +91,35 @@ void loop() {
     if ((currtouched & _BV(i)) ) {
       if (curtouchedcount > MIN_ITERATIONS) {
         //Serial.print(i); Serial.println(" touched");
-
+        sound_on = 1;
         switch (i) {
-          //case 1:
-          case 9: // Pin 9 because that's what's connected right now (lol)
-            activeNotes |= A;
+          case 0:
+            //activeNotes |= A;
+            cur_delay_us = A_period;
+            break;
+          case 1:
+            //activeNotes |= B;
+            cur_delay_us = B_period;
             break;
           case 2:
-            activeNotes |= B;
+            //activeNotes |= C;
+            cur_delay_us = C_period;
             break;
           case 3:
-            activeNotes |= C;
+            //activeNotes |= D;
+            cur_delay_us = D_period;
             break;
           case 4:
-            activeNotes |= D;
+            //activeNotes |= E;
+            cur_delay_us = E_period;
             break;
           case 5:
-            activeNotes |= E;
+            //activeNotes |= F;
+            cur_delay_us = F_period;
             break;
           case 6:
-            activeNotes |= F;
-            break;
-          case 7:
-            activeNotes |= G;
+            //activeNotes |= G;
+            cur_delay_us = G_period;
             break;
         }
          // reset our state
@@ -105,16 +127,21 @@ void loop() {
       }
       //Serial.println(curtouchedcount);
     }
+    
+    
+    
     // if it *was* touched and now *isnt*, alert!
     if (!(currtouched & _BV(i)) && (lasttouched & _BV(i))) {
       if (curtouchedcount > MIN_ITERATIONS) {
         //Serial.print(i); Serial.println(" released");
+        sound_on = 0;
+        /*
         switch (i) {
           //case 1:
           case 9: // Pin 9 because that's what's connected right now (lol)
             activeNotes &= !A;
             break;
-          case 2:
+          case 6:
             activeNotes &= !B;
             break;
           case 3:
@@ -126,23 +153,33 @@ void loop() {
           case 5:
             activeNotes &= !E;
             break;
-          case 6:
+          //case 6:
             activeNotes &= !F;
             break;
           case 7:
             activeNotes &= !G;
             break;
         }
+        */
       }
       lasttouched = 0;
       curtouchedcount = 0;
     }
+
+
   }
   
-  Serial.write(RESET);
-  Serial.write(activeNotes);
-  Serial.write(0);
-  Serial.write(0);
+  if (sound_on) digitalWrite(SOUND_PIN, HIGH);
+  delayMicroseconds(cur_delay_us);
+  if (sound_on) digitalWrite(SOUND_PIN, LOW);
+  delayMicroseconds(cur_delay_us);
+  
+  return;
+  
+//  Serial.write(RESET);
+//  Serial.write(activeNotes);
+//  Serial.write(0);
+//  Serial.write(0);
 
 
 
